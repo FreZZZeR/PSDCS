@@ -26,11 +26,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="SeparatedFunctions\" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="PSDCS.psd1" />
     <Compile Include="PSDCS.psm1" />
     <Compile Include="PSDCS.tests.ps1" />
+    <Compile Include="SeparatedFunctions\Add-DataCollectorSet.ps1" />
+    <Compile Include="SeparatedFunctions\Remove-DataCollectorSet.ps1" />
+    <Compile Include="SeparatedFunctions\Start-DataCollectorSet.ps1" />
+    <Compile Include="SeparatedFunctions\Stop-DataCollectorSet.ps1" />
+    <Compile Include="SeparatedFunctions\Write-Log.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
