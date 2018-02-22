@@ -47,6 +47,7 @@ function Add-DataCollectorSet
 	)
 	Process 
 	{
+		$XMLData = Get-Content -Path $DCSXMLTemplate
 		If ($ComputersCountPerBatch) 
 		{
 			Write-Host "Script will be executed by parallel processes"
@@ -58,7 +59,7 @@ function Add-DataCollectorSet
 				$ComputerBatch = $ComputerName[$i..$j]
 				Invoke-Command -ComputerName $ComputerBatch -ScriptBlock `
 				{
-					Param ($DCSName, $Force)
+					Param ($DCSName, $XMLData, $Force)
 					$Computer = $env:COMPUTERNAME
 					$PerfMonDataCollectorSet = New-Object -ComObject Pla.DataCollectorSet
 					$PerfMonDataCollectorSet.Query($DCSName, $null)
@@ -71,7 +72,7 @@ function Add-DataCollectorSet
 								$PerfMonDataCollectorSet.Stop($false)
 								While ($PerfMonDataCollectorSet.Status -eq "1") 
 								{
-									Start-Sleep -Milliseconds 500
+									Start-Sleep -Milliseconds 100
 								}
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
@@ -161,7 +162,7 @@ function Add-DataCollectorSet
 							Write-Host "Error! Connection to PerfMon System is NOT established on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 					}
-				} -ArgumentList $DCSName, $Force
+				} -ArgumentList $DCSName, $XMLData, $Force
 				$BatchStep++
 				$i = $j + 1
 				$j += $ComputersCountPerBatch
@@ -174,7 +175,7 @@ function Add-DataCollectorSet
 			{
 				Invoke-Command -ComputerName $Computer -ScriptBlock `
 				{
-					Param ($DCSName, $Force)
+					Param ($DCSName, $XMLData, $Force)
 					$Computer = $env:COMPUTERNAME
 					$PerfMonDataCollectorSet = New-Object -ComObject Pla.DataCollectorSet
 					$PerfMonDataCollectorSet.Query($DCSName, $null)
@@ -187,7 +188,7 @@ function Add-DataCollectorSet
 								$PerfMonDataCollectorSet.Stop($false)
 								While ($PerfMonDataCollectorSet.Status -eq "1") 
 								{
-									Start-Sleep -Milliseconds 500
+									Start-Sleep -Milliseconds 100
 								}
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
@@ -277,7 +278,7 @@ function Add-DataCollectorSet
 							Write-Host "Error! Connection to PerfMon System is NOT established on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 					}
-				} -ArgumentList $DCSName, $Force
+				} -ArgumentList $DCSName, $XMLData, $Force
 			}
 		}
 	}

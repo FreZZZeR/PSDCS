@@ -58,6 +58,7 @@ function Add-DataCollectorSet
 	)
 	Process 
 	{
+		$XMLData = Get-Content -Path $DCSXMLTemplate
 		If ($ComputersCountPerBatch) 
 		{
 			Write-Host "Script will be executed by parallel processes"
@@ -69,7 +70,7 @@ function Add-DataCollectorSet
 				$ComputerBatch = $ComputerName[$i..$j]
 				Invoke-Command -ComputerName $ComputerBatch -ScriptBlock `
 				{
-					Param ($DCSName, $Force)
+					Param ($DCSName, $XMLData, $Force)
 					$Computer = $env:COMPUTERNAME
 					$PerfMonDataCollectorSet = New-Object -ComObject Pla.DataCollectorSet
 					$PerfMonDataCollectorSet.Query($DCSName, $null)
@@ -172,7 +173,7 @@ function Add-DataCollectorSet
 							Write-Host "Error! Connection to PerfMon System is NOT established on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 					}
-				} -ArgumentList $DCSName, $Force
+				} -ArgumentList $DCSName, $XMLData, $Force
 				$BatchStep++
 				$i = $j + 1
 				$j += $ComputersCountPerBatch
@@ -185,7 +186,7 @@ function Add-DataCollectorSet
 			{
 				Invoke-Command -ComputerName $Computer -ScriptBlock `
 				{
-					Param ($DCSName, $Force)
+					Param ($DCSName, $XMLData, $Force)
 					$Computer = $env:COMPUTERNAME
 					$PerfMonDataCollectorSet = New-Object -ComObject Pla.DataCollectorSet
 					$PerfMonDataCollectorSet.Query($DCSName, $null)
@@ -288,7 +289,7 @@ function Add-DataCollectorSet
 							Write-Host "Error! Connection to PerfMon System is NOT established on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 					}
-				} -ArgumentList $DCSName, $Force
+				} -ArgumentList $DCSName, $XMLData, $Force
 			}
 		}
 	}
@@ -360,7 +361,7 @@ function Remove-DataCollectorSet
 							$PerfMonDataCollectorSet.Stop($false)
 							While ($PerfMonDataCollectorSet.Status -eq "1") 
 							{
-								Start-Sleep -Milliseconds 500
+								Start-Sleep -Milliseconds 100
 							}
 							$PerfMonDataCollectorSet.Delete()
 							If ($? -eq $true)
@@ -390,23 +391,7 @@ function Remove-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							$PerfMonDataCollectorSet.SetXml($XMLData)
-							If ($? -eq $true) 
-							{
-								$null = $PerfMonDataCollectorSet.Commit("$DCSName", $null, 0x0003)
-								If ($? -eq $true)
-								{
-									Write-Host "Data Collector Set `"$DCSName`" has been added on computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
-								}
-								Else 
-								{
-									Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added! " -ForegroundColor Red -BackgroundColor DarkBlue
-								}
-							}
-							Else 
-							{
-								Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"! Can not add XML-data to COM-object!" -ForegroundColor Red -BackgroundColor DarkBlue
-							}
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -439,28 +424,12 @@ function Remove-DataCollectorSet
 								$PerfMonDataCollectorSet.Stop($false)
 								While ($PerfMonDataCollectorSet.Status -eq "1") 
 								{
-									Start-Sleep -Milliseconds 500
+									Start-Sleep -Milliseconds 100
 								}
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
 								{
-									$PerfMonDataCollectorSet.SetXml($XMLData)
-									If ($? -eq $true) 
-									{
-										$null = $PerfMonDataCollectorSet.Commit("$DCSName", $null, 0x0003)
-										If ($? -eq $true)
-										{
-											Write-Host "Data Collector Set `"$DCSName`" has been added to computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
-										}
-										Else 
-										{
-											Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
-										}
-									}
-									Else 
-									{
-										Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"! Can not add XML-data to COM-object!" -ForegroundColor Red -BackgroundColor DarkBlue
-									}
+									Write-Host "Data Collector Set `"$DCSName`" has been removed on computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
 								}
 								Else 
 								{
@@ -472,23 +441,7 @@ function Remove-DataCollectorSet
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
 								{
-									$PerfMonDataCollectorSet.SetXml($XMLData)
-									If ($? -eq $true) 
-									{
-										$null = $PerfMonDataCollectorSet.Commit("$DCSName", $null, 0x0003)
-										If ($? -eq $true)
-										{
-											Write-Host "Data Collector Set `"$DCSName`" has been added to computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
-										}
-										Else 
-										{
-											Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
-										}
-									}
-									Else 
-									{
-										Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"! Can not add XML-data to COM-object!" -ForegroundColor Red -BackgroundColor DarkBlue
-									}
+									Write-Host "Data Collector Set `"$DCSName`" has been removed on computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
 								}
 								Else 
 								{
@@ -506,23 +459,7 @@ function Remove-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							$PerfMonDataCollectorSet.SetXml($XMLData)
-							If ($? -eq $true) 
-							{
-								$null = $PerfMonDataCollectorSet.Commit("$DCSName", $null, 0x0003)
-								If ($? -eq $true)
-								{
-									Write-Host "Data Collector Set `"$DCSName`" has been added on computer `"$Computer`"." -ForegroundColor Green -BackgroundColor DarkBlue
-								}
-								Else 
-								{
-									Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added! " -ForegroundColor Red -BackgroundColor DarkBlue
-								}
-							}
-							Else 
-							{
-								Write-Host "Error! Data Collector Set `"$DCSName`" has NOT been added to computer `"$Computer`"! Can not add XML-data to COM-object!" -ForegroundColor Red -BackgroundColor DarkBlue
-							}
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -618,7 +555,7 @@ function Start-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -672,7 +609,7 @@ function Start-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -758,7 +695,7 @@ function Stop-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -802,7 +739,7 @@ function Stop-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
