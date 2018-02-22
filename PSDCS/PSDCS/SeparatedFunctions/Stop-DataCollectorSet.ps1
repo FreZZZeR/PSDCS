@@ -72,7 +72,7 @@ function Stop-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
@@ -116,7 +116,7 @@ function Stop-DataCollectorSet
 						$PerfMonDataCollectorSet.Query("System\System Diagnostics", $null)
 						If ($? -eq $true) 
 						{
-							Write-Host "Error! Probably Data Collector Set `"$DCSName`" is not presented on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
+							Write-Host "Warning! Connection to PerfMon System is established, but Data Collector Set `"$DCSName`" is NOT found on computer `"$Computer`"!" -ForegroundColor Red -BackgroundColor DarkBlue
 						}
 						Else 
 						{
