@@ -72,7 +72,7 @@ function Add-DataCollectorSet
 								$PerfMonDataCollectorSet.Stop($false)
 								While ($PerfMonDataCollectorSet.Status -eq "1") 
 								{
-									Start-Sleep -Milliseconds 500
+									Start-Sleep -Milliseconds 100
 								}
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
@@ -188,7 +188,7 @@ function Add-DataCollectorSet
 								$PerfMonDataCollectorSet.Stop($false)
 								While ($PerfMonDataCollectorSet.Status -eq "1") 
 								{
-									Start-Sleep -Milliseconds 500
+									Start-Sleep -Milliseconds 100
 								}
 								$PerfMonDataCollectorSet.Delete()
 								If ($? -eq $true)
